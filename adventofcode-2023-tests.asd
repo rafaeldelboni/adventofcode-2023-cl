@@ -14,7 +14,8 @@
                         :serial t
                         :components ((:module "challenges"
                                               :components ((:file "test-day-01")
-                                                           (:file "test-day-02")))
+                                                           (:file "test-day-02")
+                                                           (:file "test-day-03")))
                                      (:file "test-adventofcode-2023"))))
 
   ;; The following would not return the right exit code on error, but still 0.
