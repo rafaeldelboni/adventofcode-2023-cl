@@ -16,7 +16,8 @@
   :components ((:module "src"
                         :serial t
                         :components ((:module "challenges"
-                                              :components ((:file "day-01")))
+                                              :components ((:file "day-01")
+                                                           (:file "day-02")))
                                      (:file "adventofcode-2023"
                                             :depends-on ("challenges")))))
 

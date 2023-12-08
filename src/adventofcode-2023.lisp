@@ -7,7 +7,7 @@
 (defun solve (challenge part)
   (let ((value challenge)) 
     (cond ((string= value '"day-01") (print (adventofcode-2023.challenges.day-01:main part)))
-          ((string= value '"day-02") (print "not implemented")))))
+          ((string= value '"day-02") (print (adventofcode-2023.challenges.day-02:main part))))))
 
 (defun help ()
   (format t "~&Usage:
