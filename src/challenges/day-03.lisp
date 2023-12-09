@@ -10,7 +10,9 @@
            :line->symbol-coords
            :indexed-symbols->search-coords
            :find-adjacent-digits
-           :lines->sum-symbol-adjacent-digits))
+           :lines->sum-symbol-adjacent-digits
+           :line->cog-coords
+           :indexed-cogs->search-coords))
 (in-package :adventofcode-2023.challenges.day-03)
 
 (defun map-index (type fn &rest seqs)
@@ -102,9 +104,70 @@
                              (indexed-symbols->search-coords num-lines num-columns))))
     (find-adjacent-digits indexed-digits search-coords)))
 
+;; part 2
+
+(defun line->cog-coords (index line)
+  (-<> (cl-ppcre:all-matches "[/\*]" line)
+       (partitions 2)
+       (mapcar #'(lambda (line)
+                   (cons index (first line))) <>)
+       reverse))
+
+(defun indexed-cogs->search-coords (num-lines num-columns indexed-symbols)
+  (->> indexed-symbols
+       (map 'list
+            #'(lambda (cur)
+                (map 'list #'(lambda (lines)
+                               (cons cur (cons lines (get-search-range (cdr cur) num-columns))))
+                     (get-search-range (first cur) num-lines))))
+       (reduce #'append)))
+
+(defun find-cog-adjacent-digits (indexed-digits search-coords)
+  (-<>> (mapcar
+          #'(lambda (line-coord)
+              (mapcar #'(lambda (coord)
+                          (let* ((current-cog (first line-coord))
+                                 (current-line (cdr (assoc (second line-coord) indexed-digits)))
+                                 (found-digit (cdr (assoc coord current-line :test #'idx-in-range))))
+                            (when found-digit
+                              (cons current-cog found-digit))))
+                      (rest (rest line-coord))))
+          search-coords)
+        (reduce #'append)
+        (remove-if-not #'identity)
+        (reduce #'(lambda (acc cur)
+                    (let ((cog-digit-found (assoc (first cur) acc :test #'equal)))
+                      (if cog-digit-found
+                        (progn ; like clojure do block
+                          (rplacd cog-digit-found
+                                  (append (cdr cog-digit-found)
+                                          (list (cdr cur))))
+                          acc)
+                        (append acc (list (cons (first cur) (list (cdr cur))))))))
+                <> :initial-value nil)
+        (mapcar #'(lambda (line)
+                           (cons (first line) (remove-duplicates (rest line)))))
+        (remove-if-not #'(lambda (line) (= (length (cdr line)) 2)))
+        (mapcar #'(lambda (line)
+                    (* (parse-integer (first (cdr line)))
+                       (parse-integer (first (last (cdr line)))))))
+        (reduce #'+)))
+
+(defun lines->sum-cogs-adjacent-digits (lines)
+  (let* ((num-lines (length lines))
+         (num-columns (length (first lines)))
+         (indexed-digits (map-index 'list #'cons (lines->range-number-alist lines)))
+         (search-coords (->> lines
+                             (map-index 'list #'line->cog-coords)
+                             (reduce #'append)
+                             (indexed-cogs->search-coords num-lines num-columns))))
+    (find-cog-adjacent-digits indexed-digits search-coords)))
+
 (defun main (part)
   (let ((value part))
     (cond ((string= value '"part-1") (->> "resources/day-03/input.txt"
                                           #'uiop:read-file-lines
                                           #'lines->sum-symbol-adjacent-digits))
-          ((string= value '"part-2") "not implemented"))))
+          ((string= value '"part-2") (->> "resources/day-03/input.txt"
+                                          #'uiop:read-file-lines
+                                          #'lines->sum-cogs-adjacent-digits)))))

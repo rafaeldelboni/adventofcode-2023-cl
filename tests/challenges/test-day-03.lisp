@@ -53,6 +53,15 @@
       (is (equal (indexed-symbols->search-coords 9 9 '((1 . 3) (3 . 6)))
                  '((0 2 3 4) (1 2 3 4) (2 2 3 4) (2 5 6 7) (3 5 6 7) (4 5 6 7)))))
 
+(test test-indexed-cogs->search-coords
+      (is (equal (indexed-cogs->search-coords 9 9 '((1 . 3) (4 . 6)))
+                 '(((1 . 3) 0 2 3 4)
+                   ((1 . 3) 1 2 3 4)
+                   ((1 . 3) 2 2 3 4)
+                   ((4 . 6) 3 5 6 7)
+                   ((4 . 6) 4 5 6 7)
+                   ((4 . 6) 5 5 6 7)))))
+
 (test test-find-adjacent-digits
       (is (equal (find-adjacent-digits
                    (map-index 'list #'cons
