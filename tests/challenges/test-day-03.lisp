@@ -28,9 +28,9 @@
 (test test-lines->range-number-alist
       (is (equal (lines->range-number-alist (list "467..114.."
                                                   "...*......" "..35..633."))
-                 '((((5 8) . "114") ((0 3) . "467"))
+                 '((((5 7) . "114") ((0 2) . "467"))
                    NIL
-                   (((6 9) . "633") ((2 4) . "35"))))))
+                   (((6 8) . "633") ((2 3) . "35"))))))
 
 (test test-map-index
       (is (equal (map-index 'list (lambda (x a) (cons x a))
@@ -45,4 +45,24 @@
       (is (equal (get-search-range 0 8)
                  '(0 1))))
 
- ;; (run! 'test-day-03)
+(test test-line->symbol-coords
+      (is (equal (line->symbol-coords 0 "617*...$..")
+                 '((0 . 3) (0 . 7)))))
+
+(test test-indexed-symbols->search-coords
+      (is (equal (indexed-symbols->search-coords 9 9 '((1 . 3) (3 . 6)))
+                 '((0 2 3 4) (1 2 3 4) (2 2 3 4) (2 5 6 7) (3 5 6 7) (4 5 6 7)))))
+
+(test test-find-adjacent-digits
+      (is (equal (find-adjacent-digits
+                   (map-index 'list #'cons
+                              '((((5 7) . "114") ((0 2) . "467"))
+                                NIL (((6 8) . "633") ((2 3) . "35"))
+                                NIL (((0 2) . "617")) (((7 8) . "58")) (((2 4) . "592"))
+                                (((6 8) . "755")) NIL (((5 7) . "598") ((1 3) . "664"))))
+                   '((0 2 3 4) (1 2 3 4) (2 2 3 4) (2 5 6 7) (3 5 6 7) (4 5 6 7) (3 2 3 4)
+                               (4 2 3 4) (5 2 3 4) (4 4 5 6) (5 4 5 6) (6 4 5 6) (7 2 3 4) (8 2 3 4)
+                               (9 2 3 4) (7 4 5 6) (8 4 5 6) (9 4 5 6)))
+                 4361)))
+
+;; (run! 'test-day-03)
